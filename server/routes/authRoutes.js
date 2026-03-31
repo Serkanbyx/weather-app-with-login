@@ -1,6 +1,17 @@
 const express = require("express");
+const {
+  registerValidation,
+  loginValidation,
+  register,
+  login,
+  getMe,
+} = require("../controllers/authController");
+const { protect } = require("../middleware/auth");
+
 const router = express.Router();
 
-// TODO: Auth routes will be implemented in upcoming steps
+router.post("/register", registerValidation, register);
+router.post("/login", loginValidation, login);
+router.get("/me", protect, getMe);
 
 module.exports = router;

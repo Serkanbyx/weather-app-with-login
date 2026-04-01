@@ -34,8 +34,9 @@ export function useFavorites() {
     try {
       await favoritesAPI.addFavorite(city);
       setFavorites((prev) => (prev.includes(city) ? prev : [...prev, city]));
+      return true;
     } catch {
-      /* silent — avoids breaking the UX on duplicate or network hiccup */
+      return false;
     }
   }, []);
 
@@ -43,8 +44,9 @@ export function useFavorites() {
     try {
       await favoritesAPI.removeFavorite(city);
       setFavorites((prev) => prev.filter((fav) => fav !== city));
+      return true;
     } catch {
-      /* silent */
+      return false;
     }
   }, []);
 

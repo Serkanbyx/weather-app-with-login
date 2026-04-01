@@ -72,15 +72,21 @@ function HomePage() {
       return;
     }
     if (weatherData?.name) {
-      await addFavorite(weatherData.name);
-      addToast("City added to favorites", "success");
+      const success = await addFavorite(weatherData.name);
+      addToast(
+        success ? "City added to favorites" : "Failed to add favorite. Please try again.",
+        success ? "success" : "error",
+      );
     }
   };
 
   const handleRemoveFavorite = async () => {
     if (weatherData?.name) {
-      await removeFavorite(weatherData.name);
-      addToast("City removed from favorites", "info");
+      const success = await removeFavorite(weatherData.name);
+      addToast(
+        success ? "City removed from favorites" : "Failed to remove favorite. Please try again.",
+        success ? "info" : "error",
+      );
     }
   };
 
@@ -105,9 +111,12 @@ function HomePage() {
                 favorites={favorites}
                 isLoading={favLoading}
                 onCitySelect={handleCitySelect}
-                onRemove={(city) => {
-                  removeFavorite(city);
-                  addToast("City removed from favorites", "info");
+                onRemove={async (city) => {
+                  const success = await removeFavorite(city);
+                  addToast(
+                    success ? "City removed from favorites" : "Failed to remove favorite",
+                    success ? "info" : "error",
+                  );
                 }}
                 variant="mobile"
               />
@@ -206,9 +215,12 @@ function HomePage() {
             favorites={favorites}
             isLoading={favLoading}
             onCitySelect={handleCitySelect}
-            onRemove={(city) => {
-              removeFavorite(city);
-              addToast("City removed from favorites", "info");
+            onRemove={async (city) => {
+              const success = await removeFavorite(city);
+              addToast(
+                success ? "City removed from favorites" : "Failed to remove favorite",
+                success ? "info" : "error",
+              );
             }}
             variant="sidebar"
           />

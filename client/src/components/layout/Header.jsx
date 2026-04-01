@@ -43,9 +43,15 @@ function Header() {
 
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-700">
-                  Welcome, <span className="font-semibold">{user?.name}</span>
-                </span>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">
+                    {user?.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                  <span className="font-semibold">{user?.name}</span>
+                </Link>
                 <button
                   onClick={logout}
                   className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer"
@@ -105,9 +111,16 @@ function Header() {
 
             {isAuthenticated ? (
               <>
-                <div className="px-3 py-2 text-sm text-gray-700">
-                  Welcome, <span className="font-semibold">{user?.name}</span>
-                </div>
+                <Link
+                  to="/profile"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">
+                    {user?.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                  {user?.name} — Profile
+                </Link>
                 <button
                   onClick={() => {
                     logout();

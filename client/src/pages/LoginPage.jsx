@@ -57,7 +57,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 px-4">
+    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 px-4">
       <div className="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>

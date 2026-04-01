@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { weatherAPI } from "../services/api";
@@ -11,6 +12,7 @@ import FavoritesSidebar, {
 function HomePage() {
   const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
 
   const [searchCity, setSearchCity] = useState("");
   const [weatherData, setWeatherData] = useState(null);
@@ -64,6 +66,11 @@ function HomePage() {
   };
 
   const handleAddFavorite = async () => {
+    if (!isAuthenticated) {
+      addToast("Please register to add favorites", "info");
+      navigate("/register");
+      return;
+    }
     if (weatherData?.name) {
       await addFavorite(weatherData.name);
       addToast("City added to favorites", "success");

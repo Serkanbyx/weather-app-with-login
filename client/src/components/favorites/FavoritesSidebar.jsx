@@ -1,13 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { favoritesAPI } from "../../services/api";
 
 /* ─── Custom hook: favorites state management ─── */
 export function useFavorites() {
+  const { isAuthenticated } = useAuth();
   const [favorites, setFavorites] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setFavorites([]);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchFavorites = async () => {
+      setIsLoading(true);
       try {
         const { data } = await favoritesAPI.getFavorites();
         setFavorites(data.favorites || []);
@@ -19,7 +28,7 @@ export function useFavorites() {
     };
 
     fetchFavorites();
-  }, []);
+  }, [isAuthenticated]);
 
   const addFavorite = useCallback(async (city) => {
     try {

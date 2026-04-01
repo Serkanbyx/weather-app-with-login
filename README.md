@@ -409,11 +409,11 @@ This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) f
 
 ## Developer
 
-**Serkan Bayraktar**
+**Serkanby**
 
-- 🌐 [serkanbayraktar.com](https://serkanbayraktar.com/)
-- 🐙 [@Serkanbyx](https://github.com/Serkanbyx)
-- 📧 [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
+- Website: [serkanbayraktar.com](https://serkanbayraktar.com/)
+- GitHub: [@Serkanbyx](https://github.com/Serkanbyx)
+- Email: [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
 
 ---
 
@@ -431,9 +431,9 @@ This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) f
 
 ## Contact
 
-- 🐛 [Report a Bug](https://github.com/Serkanbyx/weather-mern/issues)
-- 📧 [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
-- 🌐 [serkanbayraktar.com](https://serkanbayraktar.com/)
+- [Open an Issue](https://github.com/Serkanbyx/weather-mern/issues)
+- Email: [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
+- Website: [serkanbayraktar.com](https://serkanbayraktar.com/)
 
 ---
 

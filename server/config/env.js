@@ -16,6 +16,6 @@ module.exports = {
   mongoUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
-  clientUrl: process.env.CLIENT_URL,
+  clientUrl: process.env.CLIENT_URL?.replace(/\/+$/, ""),
   nodeEnv: process.env.NODE_ENV || "development",
 };

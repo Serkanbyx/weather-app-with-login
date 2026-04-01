@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const requiredVars = ["PORT", "MONGODB_URI", "JWT_SECRET", "OPENWEATHER_API_KEY"];
+const requiredVars = ["PORT", "MONGODB_URI", "JWT_SECRET", "OPENWEATHER_API_KEY", "CLIENT_URL"];
 
 requiredVars.forEach((key) => {
   if (!process.env[key]) {
@@ -16,4 +16,6 @@ module.exports = {
   mongoUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+  clientUrl: process.env.CLIENT_URL,
+  nodeEnv: process.env.NODE_ENV || "development",
 };

@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { authAPI } from "../services/api";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { authAPI, setOnUnauthorized } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -57,6 +57,14 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
+  }, []);
+
+  const logoutRef = useRef(logout);
+  logoutRef.current = logout;
+
+  useEffect(() => {
+    setOnUnauthorized(() => logoutRef.current());
+    return () => setOnUnauthorized(null);
   }, []);
 
   const value = {

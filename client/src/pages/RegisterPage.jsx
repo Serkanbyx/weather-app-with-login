@@ -1,26 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateForm({ name, email, password, confirmPassword }) {
-  const errors = {};
-
-  if (!name.trim()) errors.name = "Name is required.";
-  if (!email.trim()) errors.email = "Email is required.";
-  else if (!EMAIL_REGEX.test(email)) errors.email = "Please enter a valid email.";
-  if (!password) errors.password = "Password is required.";
-  else if (password.length < 6) errors.password = "Password must be at least 6 characters.";
-  if (!confirmPassword) errors.confirmPassword = "Please confirm your password.";
-  else if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match.";
-
-  return errors;
-}
+import { validateRegisterForm } from "../utils/validation";
 
 function RegisterPage() {
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -34,6 +19,8 @@ function RegisterPage() {
   const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  if (isAuthenticated) return <Navigate to="/" replace />;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -44,7 +31,7 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateRegisterForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;

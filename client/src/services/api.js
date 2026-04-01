@@ -4,7 +4,12 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
-// Attach token to every request
+let onUnauthorized = null;
+
+export const setOnUnauthorized = (callback) => {
+  onUnauthorized = callback;
+};
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -13,7 +18,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 globally & enrich error messages for better UX
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -26,9 +30,12 @@ api.interceptors.response.use(
     if (error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      onUnauthorized?.();
     }
 
-    if (error.response.status === 404) {
+    if (error.response.status === 429) {
+      error.userMessage = "Too many requests. Please slow down and try again.";
+    } else if (error.response.status === 404) {
       error.userMessage =
         error.response.data?.message || "City not found. Please check the spelling.";
     } else {

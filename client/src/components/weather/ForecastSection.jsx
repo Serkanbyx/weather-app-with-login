@@ -1,23 +1,4 @@
-const WEATHER_GRADIENTS = {
-  clear: "from-amber-400 to-orange-300",
-  clouds: "from-slate-400 to-blue-200",
-  rain: "from-blue-600 to-slate-300",
-  drizzle: "from-blue-400 to-gray-200",
-  thunderstorm: "from-purple-700 to-indigo-400",
-  snow: "from-blue-200 to-gray-100",
-  mist: "from-gray-400 to-gray-200",
-  fog: "from-gray-500 to-gray-200",
-  haze: "from-yellow-300 to-gray-200",
-  default: "from-blue-500 to-cyan-300",
-};
-
-const getGradient = (weatherMain) => {
-  const key = weatherMain?.toLowerCase() || "default";
-  return WEATHER_GRADIENTS[key] || WEATHER_GRADIENTS.default;
-};
-
-const capitalizeFirst = (str) =>
-  str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+import { getGradient, capitalizeFirst, FORECAST_GRADIENTS } from "../../utils/weather";
 
 const getDailyForecast = (data) => {
   if (!data?.list) return [];
@@ -74,7 +55,7 @@ function ForecastSection({ data }) {
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
         {dailyForecast.map(({ representative, tempMin, tempMax }) => {
           const weatherMain = representative.weather[0]?.main;
-          const gradient = getGradient(weatherMain);
+          const gradient = getGradient(weatherMain, FORECAST_GRADIENTS);
 
           return (
             <div

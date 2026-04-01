@@ -1,22 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateForm({ email, password }) {
-  const errors = {};
-
-  if (!email.trim()) errors.email = "Email is required.";
-  else if (!EMAIL_REGEX.test(email)) errors.email = "Please enter a valid email.";
-  if (!password) errors.password = "Password is required.";
-
-  return errors;
-}
+import { validateLoginForm } from "../utils/validation";
 
 function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -24,6 +13,8 @@ function LoginPage() {
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +26,7 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateLoginForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;

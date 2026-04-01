@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { weatherAPI } from "../services/api";
+import ForecastSection from "../components/weather/ForecastSection";
 
 function HomePage() {
   const [searchCity, setSearchCity] = useState("");
@@ -34,27 +35,6 @@ function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getDailyForecast = (data) => {
-    if (!data?.list) return [];
-
-    const dailyMap = {};
-    data.list.forEach((item) => {
-      const date = item.dt_txt.split(" ")[0];
-      const hour = item.dt_txt.split(" ")[1];
-
-      if (!dailyMap[date] || hour === "12:00:00") {
-        dailyMap[date] = item;
-      }
-    });
-
-    return Object.values(dailyMap).slice(0, 5);
-  };
-
-  const formatDay = (dtTxt) => {
-    const date = new Date(dtTxt);
-    return date.toLocaleDateString("en-US", { weekday: "short" });
   };
 
   const capitalizeFirst = (str) =>
@@ -178,35 +158,10 @@ function HomePage() {
         </div>
       )}
 
-      {/* Forecast Section (inline — will be replaced by ForecastSection component) */}
+      {/* Forecast Section */}
       {forecastData && !isLoading && (
         <div className="max-w-2xl mx-auto">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            5-Day Forecast
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {getDailyForecast(forecastData).map((day) => (
-              <div
-                key={day.dt}
-                className="bg-white rounded-xl shadow-sm p-4 text-center"
-              >
-                <p className="text-sm font-medium text-gray-600">
-                  {formatDay(day.dt_txt)}
-                </p>
-                <img
-                  src={`https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`}
-                  alt={day.weather[0].description}
-                  className="w-12 h-12 mx-auto"
-                />
-                <p className="text-lg font-bold text-gray-800">
-                  {Math.round(day.main.temp)}°C
-                </p>
-                <p className="text-xs text-gray-500">
-                  {capitalizeFirst(day.weather[0].description)}
-                </p>
-              </div>
-            ))}
-          </div>
+          <ForecastSection data={forecastData} />
         </div>
       )}
     </div>

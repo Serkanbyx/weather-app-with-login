@@ -1,10 +1,179 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateForm({ name, email, password, confirmPassword }) {
+  const errors = {};
+
+  if (!name.trim()) errors.name = "Name is required.";
+  if (!email.trim()) errors.email = "Email is required.";
+  else if (!EMAIL_REGEX.test(email)) errors.email = "Please enter a valid email.";
+  if (!password) errors.password = "Password is required.";
+  else if (password.length < 6) errors.password = "Password must be at least 6 characters.";
+  if (!confirmPassword) errors.confirmPassword = "Please confirm your password.";
+  else if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match.";
+
+  return errors;
+}
+
 function RegisterPage() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setApiError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setApiError("");
+
+    try {
+      await register(formData.name, formData.email, formData.password);
+      navigate("/");
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        "Registration failed. Please try again.";
+      setApiError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-blue-600 mb-4">Register</h1>
-        <p className="text-gray-600">
-          Registration form will be implemented here.
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 px-4">
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
+          <p className="text-gray-500 mt-2">Join us to track weather worldwide</p>
+        </div>
+
+        {apiError && (
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            {apiError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={`w-full rounded-lg border px-4 py-2.5 text-gray-800 outline-none transition-all
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                ${errors.name ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50 hover:border-gray-400"}`}
+              placeholder="John Doe"
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full rounded-lg border px-4 py-2.5 text-gray-800 outline-none transition-all
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                ${errors.email ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50 hover:border-gray-400"}`}
+              placeholder="you@example.com"
+            />
+            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full rounded-lg border px-4 py-2.5 text-gray-800 outline-none transition-all
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                ${errors.password ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50 hover:border-gray-400"}`}
+              placeholder="Min. 6 characters"
+            />
+            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={`w-full rounded-lg border px-4 py-2.5 text-gray-800 outline-none transition-all
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                ${errors.confirmPassword ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50 hover:border-gray-400"}`}
+              placeholder="Re-enter your password"
+            />
+            {errors.confirmPassword && (
+              <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-white font-semibold
+              hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+              disabled:opacity-60 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
+            {isSubmitting ? "Creating Account..." : "Register"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-800 transition-colors">
+            Login
+          </Link>
         </p>
       </div>
     </div>

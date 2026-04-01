@@ -112,6 +112,7 @@ function WeatherCard({
             {isFavorite ? (
               <button
                 onClick={onRemoveFavorite}
+                aria-label={`Remove ${data.name} from favorites`}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/20 hover:bg-red-500/80 border border-white/30 text-white font-medium text-sm transition-all duration-200 cursor-pointer backdrop-blur-sm"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -122,6 +123,7 @@ function WeatherCard({
             ) : (
               <button
                 onClick={onAddFavorite}
+                aria-label={`Add ${data.name} to favorites`}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-medium text-sm transition-all duration-200 cursor-pointer backdrop-blur-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -13,15 +13,32 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 globally — clear session and redirect to login
+// Handle 401 globally & enrich error messages for better UX
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (!error.response) {
+      error.userMessage =
+        "Unable to connect. Please check your internet connection.";
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
     }
+
+    if (error.response.status === 404) {
+      error.userMessage =
+        error.response.data?.message || "City not found. Please check the spelling.";
+    } else {
+      error.userMessage =
+        error.response.data?.message ||
+        error.response.data?.errors?.[0]?.msg ||
+        "Something went wrong. Please try again.";
+    }
+
     return Promise.reject(error);
   }
 );

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -21,6 +22,7 @@ function validateForm({ name, email, password, confirmPassword }) {
 function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -53,12 +55,10 @@ function RegisterPage() {
 
     try {
       await register(formData.name, formData.email, formData.password);
+      addToast("Account created successfully", "success");
       navigate("/");
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.response?.data?.errors?.[0]?.msg ||
-        "Registration failed. Please try again.";
+      const message = err.userMessage || "Registration failed. Please try again.";
       setApiError(message);
     } finally {
       setIsSubmitting(false);
@@ -66,7 +66,7 @@ function RegisterPage() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 px-4 py-8">
+    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 px-4 py-8 animate-fade-in">
       <div className="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>

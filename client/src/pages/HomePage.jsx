@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { weatherAPI } from "../services/api";
 import WeatherCard from "../components/weather/WeatherCard";
 import ForecastSection from "../components/weather/ForecastSection";
@@ -9,6 +10,7 @@ import FavoritesSidebar, {
 
 function HomePage() {
   const { isAuthenticated } = useAuth();
+  const { addToast } = useToast();
 
   const [searchCity, setSearchCity] = useState("");
   const [weatherData, setWeatherData] = useState(null);
@@ -16,8 +18,15 @@ function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { favorites, isLoading: favLoading, addFavorite, removeFavorite, isFavorite } =
-    useFavorites();
+  const inputRef = useRef(null);
+
+  const {
+    favorites,
+    isLoading: favLoading,
+    addFavorite,
+    removeFavorite,
+    isFavorite,
+  } = useFavorites();
 
   const fetchWeather = useCallback(async (city) => {
     const trimmed = city.trim();
@@ -35,8 +44,7 @@ function HomePage() {
       setWeatherData(weatherRes.data);
       setForecastData(forecastRes.data);
     } catch (err) {
-      const message =
-        err.response?.data?.message || "An error occurred while fetching data.";
+      const message = err.userMessage || "An error occurred while fetching data.";
       setError(message);
       setWeatherData(null);
       setForecastData(null);
@@ -58,12 +66,14 @@ function HomePage() {
   const handleAddFavorite = async () => {
     if (weatherData?.name) {
       await addFavorite(weatherData.name);
+      addToast("City added to favorites", "success");
     }
   };
 
   const handleRemoveFavorite = async () => {
     if (weatherData?.name) {
       await removeFavorite(weatherData.name);
+      addToast("City removed from favorites", "info");
     }
   };
 
@@ -72,7 +82,7 @@ function HomePage() {
     : false;
 
   return (
-    <div className="flex-1 bg-gray-100 py-8 px-4">
+    <div className="flex-1 bg-gray-100 py-8 px-4 animate-fade-in">
       <div className="max-w-6xl mx-auto flex gap-6">
         {/* ── Main Content ── */}
         <div className="flex-1 min-w-0">
@@ -88,7 +98,10 @@ function HomePage() {
                 favorites={favorites}
                 isLoading={favLoading}
                 onCitySelect={handleCitySelect}
-                onRemove={removeFavorite}
+                onRemove={(city) => {
+                  removeFavorite(city);
+                  addToast("City removed from favorites", "info");
+                }}
                 variant="mobile"
               />
             )}
@@ -109,10 +122,13 @@ function HomePage() {
                   />
                 </svg>
                 <input
+                  ref={inputRef}
                   type="text"
                   value={searchCity}
                   onChange={(e) => setSearchCity(e.target.value)}
                   placeholder="Enter city name..."
+                  aria-label="City name"
+                  autoFocus
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 bg-white shadow-sm"
                 />
               </div>
@@ -131,22 +147,34 @@ function HomePage() {
             </form>
 
             {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-center">
+              <div
+                className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-center flex items-center justify-center gap-2"
+                role="alert"
+              >
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
                 {error}
               </div>
             )}
           </div>
 
-          {/* Loading Spinner */}
-          {isLoading && (
-            <div className="flex justify-center py-12">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-            </div>
-          )}
+          {/* Skeleton Loader */}
+          {isLoading && <WeatherSkeleton />}
 
           {/* Weather Card */}
           {weatherData && !isLoading && (
-            <div className="max-w-2xl mx-auto mb-6">
+            <div className="max-w-2xl mx-auto mb-6 animate-fade-in">
               <WeatherCard
                 data={weatherData}
                 onAddFavorite={handleAddFavorite}
@@ -159,7 +187,7 @@ function HomePage() {
 
           {/* Forecast Section */}
           {forecastData && !isLoading && (
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto animate-fade-in">
               <ForecastSection data={forecastData} />
             </div>
           )}
@@ -171,10 +199,54 @@ function HomePage() {
             favorites={favorites}
             isLoading={favLoading}
             onCitySelect={handleCitySelect}
-            onRemove={removeFavorite}
+            onRemove={(city) => {
+              removeFavorite(city);
+              addToast("City removed from favorites", "info");
+            }}
             variant="sidebar"
           />
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Skeleton loader for weather card + forecast ─── */
+
+function WeatherSkeleton() {
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Weather card skeleton */}
+      <div className="rounded-2xl bg-gray-200 p-6 sm:p-8 animate-skeleton">
+        <div className="flex items-start justify-between mb-4">
+          <div className="space-y-2">
+            <div className="h-7 w-40 bg-gray-300 rounded-lg" />
+            <div className="h-4 w-24 bg-gray-300 rounded" />
+          </div>
+          <div className="w-20 h-20 bg-gray-300 rounded-full" />
+        </div>
+        <div className="mb-6">
+          <div className="h-14 w-32 bg-gray-300 rounded-lg" />
+          <div className="h-4 w-28 bg-gray-300 rounded mt-2" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-16 bg-gray-300 rounded-xl" />
+          ))}
+        </div>
+      </div>
+
+      {/* Forecast skeleton */}
+      <div>
+        <div className="h-6 w-36 bg-gray-200 rounded mb-4 animate-skeleton" />
+        <div className="flex gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="min-w-[140px] flex-1 h-40 bg-gray-200 rounded-xl animate-skeleton"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
